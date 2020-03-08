@@ -57,6 +57,10 @@ def get_employer_info(employer_link, employer_name):
             '.left_width > div > div > div',
         )[1]
         basic_info = info.select('div')
+
+        if employer_name == 'Абрамский Михаил Михайлович':
+            data = {**data, **get_links(soup)}
+
         additional_info_header = info.find('b')
         if additional_info_header is not None:
             additional_info = additional_info_header.next_sibling.next_sibling
@@ -103,6 +107,13 @@ def parse_html(html):
         return ' '.join(parse_html(item) for item in html.children)
 
     return str(html.string).strip()
+
+
+def get_links(employer_soup):
+    link_rows = employer_soup.select('.right_block > div:first-child table tr')
+    links = {row.contents[0].string.strip(): row.contents[1].string
+             for row in link_rows}
+    return {'Ссылки': links}
 
 
 if __name__ == '__main__':
