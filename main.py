@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import json
 
 HTML_PARSER = 'html.parser'
@@ -48,18 +48,24 @@ def get_employers():
 
 def get_employer_info(employer_link, employer_name):
     soup = BeautifulSoup(requests.get(employer_link).text, HTML_PARSER)
-    try:
-        employer_info = soup.select(
-            '.left_width > div > div > div',
-        )[1].select('div')
-    except IndexError:
-        return {}
-
     data = {
         'link': employer_link,
     }
+
+    try:
+        info = soup.select(
+            '.left_width > div > div > div',
+        )[1]
+        basic_info = info.select('div')
+        additional_info_header = info.find('b')
+        if additional_info_header is not None:
+            additional_info = additional_info_header.next_sibling.next_sibling
+            data['Дополнительные сведения'] = parse_html_list(additional_info)
+    except IndexError:
+        return {}
+
     lst = [
-        (employer_info[i], employer_info[i + 1]) for i in range(0, len(employer_info), 2)
+        (basic_info[i], basic_info[i + 1]) for i in range(0, len(basic_info), 2)
     ]
     for (k, v) in lst:
         values = [
@@ -68,6 +74,35 @@ def get_employer_info(employer_link, employer_name):
         data[k.get_text()] = values
 
     return employer_name, data
+
+
+def parse_html_list(html_list):
+    result = {
+        'title': '',
+        'items': [],
+    }
+    for item in html_list.contents:
+        if item.name != 'li':
+            continue
+
+        if item.ul:
+            title = [parse_html(i) for i in item.children if i != '\n' and i.name != 'ul']
+
+            result['items'].append(
+                {**parse_html_list(item.ul), 'title': ' '.join(title)}
+            )
+            continue
+
+        result['items'].append({'title': parse_html(item)})
+
+    return result
+
+
+def parse_html(html):
+    if isinstance(html, Tag):
+        return ' '.join(parse_html(item) for item in html.children)
+
+    return str(html.string).strip()
 
 
 if __name__ == '__main__':
