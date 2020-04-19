@@ -113,7 +113,7 @@ def parse_html(html):
 
 def get_links(employer_soup):
     link_rows = employer_soup.select('.right_block > div:first-child table tr')
-    links = {row.contents[0].string.strip(): row.contents[1].string
+    links = {row.contents[0].string.strip()[:-1]: row.contents[1].string
              for row in link_rows}
     return {'Ссылки': links}
 
