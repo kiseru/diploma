@@ -22,26 +22,26 @@ def get_employers():
     )
     soup = BeautifulSoup(r.text, HTML_PARSER)
 
-    employers_count = int(
-        soup.select(
-            '#ss_content > div.area_width > div > div:nth-child(2) > table > tr > td'
-        )[0].string.split(' ')[1]
-    )
+    str_count = soup.select(
+        '#ss_content > div.area_width > div > div:nth-child(2) > table > tr > td'  # noqa
+    )[0].string.split(' ')[1]
 
     getting_employers_request_settings = {
         'p_id': 6895,
         'p_sub': 7860,
         'p_order': 1,
-        'p_rec_count': employers_count,
+        'p_rec_count': int(str_count),
     }
     r = requests.post(
         KFU_MAIN_PAGE_URL,
         data=getting_employers_request_settings,
     )
     soup = BeautifulSoup(r.text, HTML_PARSER)
-    anchors = [i.find('a') for i in soup.find_all('tr', attrs={'class': 'konf_tr'})]
+    anchors = [i.find('a') for i in
+               soup.find_all('tr', attrs={'class': 'konf_tr'})]
     anchors = {
-        anchor['href']: anchor.string for anchor in anchors if anchor is not None
+        anchor['href']: anchor.string for anchor in anchors if
+        anchor is not None
     }
     return anchors
 
@@ -69,11 +69,13 @@ def get_employer_info(employer_link, employer_name):
         return {}
 
     lst = [
-        (basic_info[i], basic_info[i + 1]) for i in range(0, len(basic_info), 2)
+        (basic_info[i], basic_info[i + 1])
+        for i in range(0, len(basic_info), 2)
     ]
     for (k, v) in lst:
         values = [
-            i.get_text().replace('\n', '') for i in v.select('.menu_list > .li_spec')
+            i.get_text().replace('\n', '') for i in
+            v.select('.menu_list > .li_spec')
         ]
         data[k.get_text()] = values
 
@@ -90,7 +92,8 @@ def parse_html_list(html_list):
             continue
 
         if item.ul:
-            title = [parse_html(i) for i in item.children if i != '\n' and i.name != 'ul']
+            title = [parse_html(i) for i in item.children
+                     if i != '\n' and i.name != 'ul']
 
             result['items'].append(
                 {**parse_html_list(item.ul), 'title': ' '.join(title)}
