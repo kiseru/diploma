@@ -58,8 +58,7 @@ def get_employer_info(employer_link, employer_name):
         )[1]
         basic_info = info.select('div')
 
-        if employer_name == 'Абрамский Михаил Михайлович':
-            data = {**data, **get_links(soup)}
+        data = {**data, **get_links(soup)}
 
         additional_info_header = info.find('b')
         if additional_info_header is not None:
