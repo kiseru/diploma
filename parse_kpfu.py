@@ -3,10 +3,12 @@ import json
 import requests
 from bs4 import BeautifulSoup, Tag
 
-from main import EMPLOYERS_JSON, HTML_PARSER, JSON_INDENT, LINKS
-
 KFU_MAIN_PAGE_URL = 'https://kpfu.ru/main_page'
 KFU_EMPLOYERS_PAGE_URL = 'https://kpfu.ru/staff/sotrudniki-kfu'
+EMPLOYERS_JSON = 'employers.json'
+HTML_PARSER = 'html.parser'
+JSON_INDENT = 2
+LINKS = 'Ссылки'
 
 
 def parse_kpfu():
