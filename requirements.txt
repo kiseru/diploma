@@ -1,2 +1,6 @@
 requests
 beautifulsoup4==4.8.1
+networkx
+matplotlib
+pydot
+transliterate==1.10.2

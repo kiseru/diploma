@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 
 import requests
 from bs4 import BeautifulSoup
@@ -28,8 +29,8 @@ def parse_scholar_articles():
         bs_articles = bs.select("#gsc_a_t .gsc_a_tr")
         articles = [parse_article(bs_article) for bs_article in
                     bs_articles]
-        co_authors = list({co_author for article in articles
-                      for co_author in article['authors']})
+        co_authors = Counter(co_author for article in articles
+                      for co_author in article['authors'])
         employers[employer][GOOGLE_SCHOLAR] = articles
         employers[employer]['co-authors'] = co_authors
         with open(EMPLOYERS_JSON, 'w', encoding='utf-8') as fp:
@@ -60,3 +61,7 @@ def parse_authors(bs_article):
     bs_article = BeautifulSoup(article.text, HTML_PARSER)
     bs_authors = bs_article.select_one('.gsc_vcd_value')
     return bs_authors.string.split(', ')
+
+
+if __name__ == '__main__':
+    parse_scholar_articles()
